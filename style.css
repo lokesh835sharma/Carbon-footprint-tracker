@@ -191,7 +191,7 @@ input:focus, select:focus {
 .chart-bars {
     display: flex;
     align-items: flex-end;
-    height: 150px;
+    height: 180px;
     gap: 1rem;
     margin-top: 2rem;
     border-bottom: var(--border-thick);
@@ -214,6 +214,7 @@ input:focus, select:focus {
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     transition: height 0.5s ease-out;
+    max-height: calc(100% - 30px); /* Leave room for label */
 }
 
 .bar-label {
