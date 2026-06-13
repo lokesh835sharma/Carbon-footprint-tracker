@@ -30,6 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Save actual user data to restore later ---
+    let originalData = null;
+    try {
+        originalData = window.localStorage.getItem('ecotrack_data');
+    } catch(e) {}
+
     // --- Write Tests ---
 
     test("calculateActivityEmission - Transport (Car)", () => {
@@ -84,6 +90,32 @@ document.addEventListener('DOMContentLoaded', () => {
         assert(totals.total === 0, "Array with invalid items should have 0 total");
     });
 
+    test("Data Store - saveData and loadData", () => {
+        window.EcoCore.clearData();
+        const testData = { activities: [{ id: "test_1", category: "food", type: "vegan", value: 1, timestamp: new Date().toISOString() }], goal: 100, baselineSet: false, baseline: { transport: 0, energy: 0, diet: 0 } };
+        window.EcoCore.saveData(testData);
+        const loaded = window.EcoCore.loadData();
+        assert(loaded.goal === 100, "Goal not loaded correctly");
+        assert(loaded.activities.length === 1, "Activities not loaded correctly");
+    });
+
+    test("Data Store - clearData", () => {
+        window.EcoCore.clearData();
+        const loaded = window.EcoCore.loadData();
+        assert(loaded.goal === 500, "clearData should restore default goal");
+        assert(loaded.activities.length === 0, "clearData should clear activities");
+    });
+
+    test("Data Store - addActivity", () => {
+        window.EcoCore.clearData();
+        const activity = { category: 'transport', type: 'bike', value: 5 };
+        const data = window.EcoCore.addActivity(activity);
+        assert(data.activities.length === 1, "Activity not added");
+        assert(data.activities[0].category === 'transport', "Activity category incorrect");
+        assert(data.activities[0].id !== undefined, "Activity missing ID");
+        assert(data.activities[0].timestamp !== undefined, "Activity missing timestamp");
+    });
+
     // --- Run Tests ---
     console.log("🚀 Starting Automated Test Suite...");
     let passed = 0;
@@ -99,4 +131,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     console.log(`🏁 Test Run Complete: ${passed}/${tests.length} passed.`);
+    
+    // Restore original user data
+    try {
+        if (originalData !== null) {
+            window.localStorage.setItem('ecotrack_data', originalData);
+        } else {
+            window.localStorage.removeItem('ecotrack_data');
+        }
+        // Force a dashboard refresh so the UI resets
+        if (window.EcoCore && typeof window.updateDashboard === 'function') {
+            window.updateDashboard();
+        }
+    } catch(e) {}
 });
