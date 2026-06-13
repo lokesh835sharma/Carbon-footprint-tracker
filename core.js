@@ -32,28 +32,36 @@ const defaultData = {
 // Global Data Store Functions
 
 /**
- * Loads application data from LocalStorage
+ * Loads application data from LocalStorage safely
  * @returns {AppData} The stored data or default data if none exists
  */
 function loadData() {
     try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) return JSON.parse(stored);
+        if (typeof window !== 'undefined' && window.localStorage) {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                // Ensure default structure exists even if stored data is partial
+                return { ...defaultData, ...parsed };
+            }
+        }
     } catch (e) {
-        console.error("Error reading from local storage", e);
+        console.warn("Local storage read failed, using defaults.", e);
     }
-    return defaultData;
+    return { ...defaultData, activities: [] }; // Return a fresh copy
 }
 
 /**
- * Saves application data to LocalStorage
+ * Saves application data to LocalStorage safely
  * @param {AppData} data - The data object to save
  */
 function saveData(data) {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
     } catch (e) {
-        console.error("Error saving to local storage", e);
+        console.warn("Local storage write failed.", e);
     }
 }
 
@@ -63,10 +71,12 @@ function saveData(data) {
  * @returns {AppData} The updated data object
  */
 function addActivity(activity) {
+    if (!activity || !activity.category) return loadData(); // Invalid activity
+    
     const data = loadData();
     data.activities.push({
         ...activity,
-        id: Date.now().toString(),
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 5), // more unique ID
         timestamp: new Date().toISOString()
     });
     saveData(data);
@@ -78,35 +88,48 @@ function addActivity(activity) {
  * @returns {AppData} The default data object
  */
 function clearData() {
-    localStorage.removeItem(STORAGE_KEY);
-    return defaultData;
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.removeItem(STORAGE_KEY);
+        }
+    } catch (e) {
+        console.warn("Failed to clear local storage.", e);
+    }
+    return { ...defaultData, activities: [] };
 }
 
 // Global Calculator Functions
-const EMISSION_FACTORS = {
+const EMISSION_FACTORS = Object.freeze({
     transport: { car: 0.2, bus: 0.05, train: 0.04, bike: 0, walk: 0 },
     food: { beef: 15.0, chicken: 3.5, vegetarian: 1.5, vegan: 1.0 },
     energy: { electricity: 0.4 }
-};
+});
 
 /**
- * Calculates the CO2 emission for a single activity
+ * Calculates the CO2 emission for a single activity safely
  * @param {Object} activity - The activity object
  * @returns {number} The calculated emission value
  */
 function calculateActivityEmission(activity) {
-    if (!activity || !activity.category) return 0;
+    if (!activity || typeof activity !== 'object') return 0;
+    if (!activity.category || !activity.type) return 0;
+    
     let emission = 0;
+    // Ensure value is a non-negative number
+    const value = (typeof activity.value === 'number' && activity.value > 0) ? activity.value : 0;
+    
     switch (activity.category) {
         case 'transport':
-            emission = (activity.value || 0) * (EMISSION_FACTORS.transport[activity.type] || 0);
+            emission = value * (EMISSION_FACTORS.transport[activity.type] || 0);
             break;
         case 'food':
             emission = EMISSION_FACTORS.food[activity.type] || 0;
             break;
         case 'energy':
-            emission = (activity.value || 0) * EMISSION_FACTORS.energy.electricity;
+            emission = value * (EMISSION_FACTORS.energy[activity.type] || 0);
             break;
+        default:
+            return 0; // Unknown category
     }
     return Number(emission.toFixed(2));
 }
@@ -118,13 +141,18 @@ function calculateActivityEmission(activity) {
  */
 function aggregateEmissions(activities) {
     const totals = { transport: 0, food: 0, energy: 0, total: 0 };
+    
+    if (!Array.isArray(activities)) return totals;
+
     activities.forEach(act => {
+        if (!act || !act.category) return;
         const val = calculateActivityEmission(act);
         if (totals[act.category] !== undefined) {
             totals[act.category] += val;
         }
         totals.total += val;
     });
+    
     return {
         transport: Number(totals.transport.toFixed(2)),
         food: Number(totals.food.toFixed(2)),
@@ -134,12 +162,14 @@ function aggregateEmissions(activities) {
 }
 
 // Attach to window so other scripts can use them easily
-window.EcoCore = {
-    loadData,
-    saveData,
-    addActivity,
-    clearData,
-    calculateActivityEmission,
-    aggregateEmissions,
-    EMISSION_FACTORS
-};
+if (typeof window !== 'undefined') {
+    window.EcoCore = {
+        loadData,
+        saveData,
+        addActivity,
+        clearData,
+        calculateActivityEmission,
+        aggregateEmissions,
+        EMISSION_FACTORS
+    };
+}

@@ -5,6 +5,12 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure EcoCore is loaded
+    if (!window.EcoCore) {
+        console.error("EcoCore not loaded. Dashboard initialization failed.");
+        return;
+    }
+
     const { loadData, addActivity, clearData, aggregateEmissions } = window.EcoCore;
 
     // DOM Elements
@@ -76,13 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
      * Initializes the dashboard view and event listeners
      */
     function init() {
-        if(!activityForm) return; 
+        if (!activityForm || !categorySelect || !typeSelect) return; // Exit if not on dashboard page
+        
         updateTypeDropdown();
         updateDashboard();
 
         categorySelect.addEventListener('change', updateTypeDropdown);
         activityForm.addEventListener('submit', handleFormSubmit);
-        if(resetBtn) resetBtn.addEventListener('click', handleReset);
+        if (resetBtn) resetBtn.addEventListener('click', handleReset);
     }
 
     /**
@@ -90,26 +97,31 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function updateTypeDropdown() {
         const cat = categorySelect.value;
+        if (!typeOptions[cat]) return;
         
         // Securely clear and populate dropdown
         while(typeSelect.firstChild) typeSelect.removeChild(typeSelect.firstChild);
         
+        const fragment = document.createDocumentFragment();
         typeOptions[cat].forEach(opt => {
             const option = document.createElement('option');
             option.value = opt.val;
             option.textContent = opt.label;
-            typeSelect.appendChild(option);
+            fragment.appendChild(option);
         });
+        typeSelect.appendChild(fragment);
 
-        if (cat === 'food') {
-            valueGroup.style.display = 'none';
-            valInput.removeAttribute('required');
-            valInput.value = 1;
-        } else {
-            valueGroup.style.display = 'block';
-            valInput.setAttribute('required', 'true');
-            valInput.value = '';
-            valInput.placeholder = cat === 'transport' ? 'Distance in km' : 'Energy in kWh';
+        if (valueGroup && valInput) {
+            if (cat === 'food') {
+                valueGroup.style.display = 'none';
+                valInput.removeAttribute('required');
+                valInput.value = '1';
+            } else {
+                valueGroup.style.display = 'block';
+                valInput.setAttribute('required', 'true');
+                valInput.value = '';
+                valInput.placeholder = cat === 'transport' ? 'Distance in km' : 'Energy in kWh';
+            }
         }
 
         updateSimulatorUI(cat);
@@ -121,9 +133,13 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string} category - The selected emission category
      */
     function updateSimulatorUI(category) {
+        if (!simContainer || !simulatorOptions[category]) return;
+        
         // Securely clear contents
         while(simContainer.firstChild) simContainer.removeChild(simContainer.firstChild);
-        simSavingsEl.textContent = "0.0";
+        if (simSavingsEl) simSavingsEl.textContent = "0.0";
+        
+        const fragment = document.createDocumentFragment();
         
         simulatorOptions[category].forEach(opt => {
             const div = document.createElement('div');
@@ -133,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
             div.setAttribute('role', 'button');
             div.setAttribute('aria-pressed', 'false');
             
-            // Secure DOM creation replacing innerHTML
             const titleSpan = document.createElement('span');
             titleSpan.style.fontWeight = "600";
             titleSpan.textContent = opt.title;
@@ -158,20 +173,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            simContainer.appendChild(div);
+            fragment.appendChild(div);
         });
+        
+        simContainer.appendChild(fragment);
     }
 
     /**
      * Calculates the total savings selected in the simulator
      */
     function calculateSimulatorSavings() {
+        if (!simContainer || !simSavingsEl) return;
+        
         let savings = 0;
-        const toggles = simContainer.querySelectorAll('.toggle-item');
+        const toggles = simContainer.querySelectorAll('.toggle-item.active');
         toggles.forEach(toggle => {
-            if (toggle.classList.contains('active')) {
-                savings += parseFloat(toggle.getAttribute('data-savings') || "0");
-            }
+            savings += parseFloat(toggle.getAttribute('data-savings') || "0");
         });
         simSavingsEl.textContent = savings.toFixed(1);
     }
@@ -181,15 +198,21 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string} category - The selected emission category
      */
     function updateInsightsUI(category) {
+        if (!insightList || !recommendations[category]) return;
+        
         // Securely clear contents
         while(insightList.firstChild) insightList.removeChild(insightList.firstChild);
-        insightMessage.textContent = `Here are targeted actions to reduce your ${category.toUpperCase()} footprint:`;
+        if (insightMessage) {
+            insightMessage.textContent = `Here are targeted actions to reduce your ${category.toUpperCase()} footprint:`;
+        }
         
+        const fragment = document.createDocumentFragment();
         recommendations[category].forEach(rec => {
             const li = document.createElement('li');
             li.textContent = rec;
-            insightList.appendChild(li);
+            fragment.appendChild(li);
         });
+        insightList.appendChild(fragment);
     }
 
     /**
@@ -198,6 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function handleFormSubmit(e) {
         e.preventDefault();
+        if (!categorySelect || !typeSelect || !valInput) return;
+        
         const activity = {
             category: categorySelect.value,
             type: typeSelect.value,
@@ -206,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         addActivity(activity);
         
-        const btn = e.target.querySelector('button');
+        const btn = e.target.querySelector('button[type="submit"]');
         if (btn) {
             const ogText = btn.textContent;
             btn.textContent = "Logged!";
@@ -217,9 +242,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.textContent = ogText;
                 btn.style.backgroundColor = "var(--text-main)";
                 btn.style.color = "white";
-                valInput.value = '';
+                if (activity.category !== 'food') {
+                    valInput.value = '';
+                }
                 updateDashboard();
             }, 1000);
+        } else {
+            updateDashboard();
         }
     }
 
@@ -230,13 +259,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = loadData();
         const totals = aggregateEmissions(data.activities);
         
-        totalEmissionsEl.textContent = totals.total.toString();
+        if (totalEmissionsEl) {
+            totalEmissionsEl.textContent = totals.total.toString();
+        }
 
         const maxBarValue = Math.max(totals.transport, totals.food, totals.energy, 10);
         
-        barTransport.style.height = `${(totals.transport / maxBarValue) * 100}%`;
-        barFood.style.height = `${(totals.food / maxBarValue) * 100}%`;
-        barEnergy.style.height = `${(totals.energy / maxBarValue) * 100}%`;
+        if (barTransport) barTransport.style.height = `${(totals.transport / maxBarValue) * 100}%`;
+        if (barFood) barFood.style.height = `${(totals.food / maxBarValue) * 100}%`;
+        if (barEnergy) barEnergy.style.height = `${(totals.energy / maxBarValue) * 100}%`;
     }
 
     /**
