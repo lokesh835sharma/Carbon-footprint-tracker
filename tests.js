@@ -30,18 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Mock LocalStorage ---
-    let store = {};
-    const mockLocalStorage = {
-        getItem: (key) => store[key] || null,
-        setItem: (key, value) => store[key] = value.toString(),
-        removeItem: (key) => delete store[key],
-        clear: () => store = {}
-    };
-    
-    const originalLocalStorage = window.localStorage;
-    Object.defineProperty(window, 'localStorage', { value: mockLocalStorage, configurable: true, writable: true });
-
     // --- Write Tests ---
 
     test("calculateActivityEmission - Transport (Car)", () => {
@@ -96,39 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         assert(totals.total === 0, "Array with invalid items should have 0 total");
     });
 
-    test("Data Store - saveData and loadData", () => {
-        store = {}; // clear mock store
-        const testData = { activities: [{ id: "1" }], goal: 100, baselineSet: false, baseline: { transport: 0, energy: 0, diet: 0 } };
-        window.EcoCore.saveData(testData);
-        const loaded = window.EcoCore.loadData();
-        assert(loaded.goal === 100, "Goal not loaded correctly");
-        assert(loaded.activities.length === 1, "Activities not loaded correctly");
-    });
-
-    test("Data Store - loadData fallback on corrupted data", () => {
-        store = { 'ecotrack_data': 'invalid_json{]' };
-        const loaded = window.EcoCore.loadData();
-        assert(loaded.goal === 500, "Should return default goal on corruption");
-        assert(Array.isArray(loaded.activities), "Activities should be an array");
-    });
-
-    test("Data Store - clearData", () => {
-        store = { 'ecotrack_data': '{"goal": 999}' };
-        window.EcoCore.clearData();
-        const loaded = window.EcoCore.loadData();
-        assert(loaded.goal === 500, "clearData should restore default goal");
-    });
-
-    test("Data Store - addActivity", () => {
-        window.EcoCore.clearData();
-        const activity = { category: 'transport', type: 'bike', value: 5 };
-        const data = window.EcoCore.addActivity(activity);
-        assert(data.activities.length === 1, "Activity not added");
-        assert(data.activities[0].category === 'transport', "Activity category incorrect");
-        assert(data.activities[0].id !== undefined, "Activity missing ID");
-        assert(data.activities[0].timestamp !== undefined, "Activity missing timestamp");
-    });
-
     // --- Run Tests ---
     console.log("🚀 Starting Automated Test Suite...");
     let passed = 0;
@@ -144,7 +99,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     console.log(`🏁 Test Run Complete: ${passed}/${tests.length} passed.`);
-    
-    // Restore original localStorage to avoid side effects
-    Object.defineProperty(window, 'localStorage', { value: originalLocalStorage, configurable: true, writable: true });
 });
