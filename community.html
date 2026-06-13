@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrack - Community Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: var(--border-thick);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background-color: white;
+        }
+        .leaderboard-item.highlight {
+            background-color: var(--color-primary);
+            box-shadow: 4px 4px 0px var(--border-color);
+            transform: scale(1.02);
+            font-weight: 700;
+        }
+        .rank { font-size: 1.5rem; font-weight: 700; width: 40px;}
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .badge {
+            border: var(--border-thick);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: #ddd;
+            opacity: 0.5;
+            transition: all 0.3s;
+            margin: 0 auto;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .badge.earned {
+            opacity: 1;
+            background-color: var(--color-accent);
+            color: white;
+            box-shadow: var(--shadow-hover);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>EcoTrack</h1>
+            <p class="subtitle">Understand. Track. Reduce.</p>
+        </div>
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="history.html" class="nav-link">History</a>
+            <a href="community.html" class="nav-link active">Community</a>
+            <a href="learn.html" class="nav-link">Learn</a>
+        </nav>
+        <div></div>
+    </header>
+
+    <main class="dashboard-grid">
+        <section class="card pink">
+            <h2>Global Leaderboard</h2>
+            <p>See how your emissions stack up against the global average and top savers this week.</p>
+            
+            <div style="margin-top: 1.5rem;" id="leaderboardContainer">
+                <div class="leaderboard-item">
+                    <span class="rank">#1</span>
+                    <span>EcoWarrior99</span>
+                    <span>45 kg CO2</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">#2</span>
+                    <span>GreenPlanet</span>
+                    <span>60 kg CO2</span>
+                </div>
+                <!-- User's score inserted here -->
+                <div class="leaderboard-item highlight" id="userScoreItem">
+                    <span class="rank">#?</span>
+                    <span>You</span>
+                    <span id="userScore">0 kg CO2</span>
+                </div>
+                
+                <div class="leaderboard-item" style="background-color: #eee; margin-top: 2rem;">
+                    <span class="rank">-</span>
+                    <span>Global Average</span>
+                    <span>150 kg CO2</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Your Badges</h2>
+            <p>Complete actions to unlock sustainable achievements.</p>
+            
+            <div class="badge-grid">
+                <div>
+                    <div class="badge" id="badgeStarted">First Log</div>
+                </div>
+                <div>
+                    <div class="badge" id="badgeTransit">Public Transit Hero</div>
+                </div>
+                <div>
+                    <div class="badge" id="badgeVegan">Plant Based</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="core.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const { loadData, aggregateEmissions } = window.EcoCore;
+            const data = loadData();
+            const totals = aggregateEmissions(data.activities);
+            
+            // Update Leaderboard
+            document.getElementById('userScore').textContent = `${totals.total} kg CO2`;
+            
+            // Logic for Badges
+            if (data.activities.length > 0) {
+                document.getElementById('badgeStarted').classList.add('earned');
+                document.getElementById('badgeStarted').style.backgroundColor = 'var(--color-primary)';
+            }
+            
+            const hasTransit = data.activities.some(a => a.type === 'bus' || a.type === 'train');
+            if (hasTransit) {
+                document.getElementById('badgeTransit').classList.add('earned');
+                document.getElementById('badgeTransit').style.backgroundColor = 'var(--color-secondary)';
+            }
+
+            const hasVegan = data.activities.some(a => a.type === 'vegan');
+            if (hasVegan) {
+                document.getElementById('badgeVegan').classList.add('earned');
+            }
+        });
+    </script>
+</body>
+</html>

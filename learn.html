@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrack - Learn</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .article-card {
+            border: var(--border-thick);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: var(--radius-box);
+            background-color: white;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+        .article-card h3 { color: var(--color-accent); font-size: 1.5rem;}
+        .fact-box {
+            background-color: var(--color-primary);
+            padding: 1rem;
+            border: var(--border-thick);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>EcoTrack</h1>
+            <p class="subtitle">Understand. Track. Reduce.</p>
+        </div>
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="history.html" class="nav-link">History</a>
+            <a href="community.html" class="nav-link">Community</a>
+            <a href="learn.html" class="nav-link active">Learn</a>
+        </nav>
+        <div></div>
+    </header>
+
+    <main>
+        <section class="card green" style="margin-bottom: 2rem;">
+            <h2>The Science of Carbon Footprints</h2>
+            <p style="font-size: 1.2rem; font-weight: 600;">Understanding your impact is the first step to reducing it.</p>
+        </section>
+
+        <div class="dashboard-grid">
+            <div>
+                <article class="article-card">
+                    <h3>1. The Impact of Transportation</h3>
+                    <p>Transportation accounts for over one-quarter of greenhouse gas emissions. A typical passenger vehicle emits about 4.6 metric tons of carbon dioxide per year. By switching just one car trip a week to public transit, biking, or walking, you can significantly shrink your footprint.</p>
+                    <div class="fact-box">Fact: Riding a bus reduces CO2 emissions by up to 80% compared to driving alone.</div>
+                </article>
+
+                <article class="article-card">
+                    <h3>2. The Food Print</h3>
+                    <p>What you eat matters. The production of meat, particularly beef, requires massive amounts of land, water, and energy, releasing significant methane—a greenhouse gas much more potent than CO2.</p>
+                    <div class="fact-box">Fact: A plant-based diet can reduce your food-related carbon footprint by up to 73%.</div>
+                </article>
+            </div>
+
+            <div>
+                <article class="article-card">
+                    <h3>3. Energy at Home</h3>
+                    <p>Residential energy use is a major contributor to global emissions. Simple habits like turning off lights, unplugging "vampire" electronics, and using energy-efficient appliances add up quickly.</p>
+                    <div class="fact-box">Fact: Heating and cooling account for nearly half of a typical home's energy use.</div>
+                </article>
+
+                <section class="card pink">
+                    <h2>Take Action Today</h2>
+                    <ul style="margin-left: 1.5rem; font-weight: 600;">
+                        <li>Log your activities daily in the Dashboard.</li>
+                        <li>Use the "What-If" simulator to find easy wins.</li>
+                        <li>Check the Community page to earn badges.</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

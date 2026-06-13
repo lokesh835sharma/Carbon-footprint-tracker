@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrack - Own Your Impact</title>
+    <meta name="description" content="Understand, track, and reduce your carbon footprint with actionable insights.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div>
+            <h1>EcoTrack</h1>
+            <p class="subtitle">Understand. Track. Reduce.</p>
+        </div>
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link active">Dashboard</a>
+            <a href="history.html" class="nav-link">History</a>
+            <a href="community.html" class="nav-link">Community</a>
+            <a href="learn.html" class="nav-link">Learn</a>
+        </nav>
+        <div>
+            <button class="btn secondary" id="resetBtn" aria-label="Reset Data">Reset Data</button>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        
+        <!-- SECTION 1: DASHBOARD (Understand & Track) -->
+        <section class="card green" aria-labelledby="dashboardHeading">
+            <h2 id="dashboardHeading">Your Footprint</h2>
+            <p>Total Emissions</p>
+            <div class="metric-large"><span id="totalEmissions">0</span> <span style="font-size: 1.5rem">kg CO2</span></div>
+            
+            <div class="chart-bars" aria-label="Emissions breakdown by category">
+                <div class="bar-wrapper">
+                    <div class="bar" id="barTransport" style="height: 5%; background-color: #f472b6;"></div>
+                    <span class="bar-label">Transport</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar" id="barFood" style="height: 5%; background-color: #fb923c;"></div>
+                    <span class="bar-label">Food</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar" id="barEnergy" style="height: 5%; background-color: #ffffff;"></div>
+                    <span class="bar-label">Energy</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: LOG ACTIVITY (Track) -->
+        <section class="card" aria-labelledby="logHeading">
+            <h2 id="logHeading">Log Activity</h2>
+            <form id="activityForm">
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required>
+                        <option value="transport">Transportation</option>
+                        <option value="food">Diet / Meal</option>
+                        <option value="energy">Energy Usage</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="type">Specific Action</label>
+                    <select id="type" name="type" required>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="form-group" id="valueGroup">
+                    <label for="valInput">Amount</label>
+                    <input type="number" id="valInput" name="value" min="0" step="0.1" placeholder="e.g. km traveled or kWh" required>
+                </div>
+
+                <button type="submit" class="btn">Log Impact</button>
+            </form>
+        </section>
+
+        <!-- SECTION 3: INSIGHTS & SIMULATOR (Reduce & Understand) -->
+        <section class="card pink" aria-labelledby="simulatorHeading">
+            <h2 id="simulatorHeading">"What-If" Simulator</h2>
+            <p>Toggle actions to see potential savings.</p>
+            <div style="margin-top: 1rem;">
+                <div class="toggle-item" data-savings="4.0" tabindex="0" role="button" aria-pressed="false">
+                    <span style="font-weight: 600;">Bike instead of drive (20km)</span>
+                    <span class="subtitle">-4.0 kg</span>
+                </div>
+                <div class="toggle-item" data-savings="13.5" tabindex="0" role="button" aria-pressed="false">
+                    <span style="font-weight: 600;">Swap beef meal for vegetarian</span>
+                    <span class="subtitle">-13.5 kg</span>
+                </div>
+                <div class="toggle-item" data-savings="2.5" tabindex="0" role="button" aria-pressed="false">
+                    <span style="font-weight: 600;">Turn off AC for 5 hours</span>
+                    <span class="subtitle">-2.5 kg</span>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;">
+                Potential Savings: <span id="simSavings">0</span> kg CO2
+            </div>
+        </section>
+
+        <!-- SECTION 4: SMART INSIGHTS -->
+        <section class="card orange" aria-labelledby="insightsHeading">
+            <h2 id="insightsHeading">Smart Insights</h2>
+            <p id="insightMessage">Start logging activities to get personalized recommendations to reduce your footprint.</p>
+            <ul class="insights-list" id="insightList" style="margin-top: 1rem;">
+                <!-- Populated dynamically -->
+            </ul>
+        </section>
+
+    </main>
+
+    <script src="core.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

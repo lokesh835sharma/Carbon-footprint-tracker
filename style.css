@@ -1,0 +1,252 @@
+/* style.css - Vibrant Neobrutalist Design System */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+
+:root {
+    --bg-color: #f4ebd9; /* Warm off-white */
+    --text-main: #111111;
+    --border-color: #111111;
+    
+    /* Vibrant Palette */
+    --color-primary: #a3e635; /* Lime */
+    --color-secondary: #f472b6; /* Pink */
+    --color-accent: #fb923c; /* Orange */
+    --color-card: #ffffff;
+    
+    --shadow-hard: 6px 6px 0px var(--border-color);
+    --shadow-hover: 2px 2px 0px var(--border-color);
+    
+    --border-thick: 3px solid var(--border-color);
+    --radius-box: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    margin-bottom: 3rem;
+    border-bottom: var(--border-thick);
+    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.nav-bar {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--color-card);
+    padding: 0.5rem 1rem;
+    border: var(--border-thick);
+    border-radius: var(--radius-box);
+    box-shadow: var(--shadow-hover);
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.nav-link:hover {
+    background-color: #f0f0f0;
+}
+
+.nav-link.active {
+    background-color: var(--color-primary);
+    border: 2px solid var(--border-color);
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+}
+
+h2, h3 {
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+/* Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Neobrutalist Cards */
+.card {
+    background-color: var(--color-card);
+    border: var(--border-thick);
+    border-radius: var(--radius-box);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-hard);
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translate(4px, 4px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Card Variations */
+.card.green { background-color: var(--color-primary); }
+.card.pink { background-color: var(--color-secondary); }
+.card.orange { background-color: var(--color-accent); }
+
+/* Forms & Inputs */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+input, select, button {
+    font-family: 'Space Grotesk', sans-serif;
+    width: 100%;
+    padding: 0.8rem;
+    border: var(--border-thick);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: var(--color-card);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    cursor: pointer;
+    background-color: var(--text-main);
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0px var(--color-accent);
+    transition: all 0.1s ease;
+    margin-top: 1rem;
+}
+
+.btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--color-accent);
+}
+
+.btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px var(--color-accent);
+}
+
+.btn.secondary {
+    background-color: var(--color-primary);
+    color: var(--text-main);
+    box-shadow: 4px 4px 0px var(--text-main);
+}
+
+/* Visuals */
+.metric-large {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin: 1rem 0;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    height: 150px;
+    gap: 1rem;
+    margin-top: 2rem;
+    border-bottom: var(--border-thick);
+    padding-bottom: 10px;
+}
+
+.bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.bar {
+    width: 100%;
+    background-color: var(--text-main);
+    border: var(--border-thick);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    transition: height 0.5s ease-out;
+}
+
+.bar-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Simulator Toggles */
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: var(--border-thick);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background-color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.toggle-item:hover {
+    background-color: #f0f0f0;
+}
+
+.toggle-item.active {
+    background-color: var(--color-primary);
+}
+
+.insights-list li {
+    margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
