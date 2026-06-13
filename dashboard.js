@@ -1,3 +1,4 @@
+"use strict";
 /**
  * dashboard.js
  * Logic specifically for index.html (Dashboard)
@@ -71,9 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
         energy: ["Switch to LED bulbs", "Unplug vampire appliances", "Adjust thermostat by 2 degrees"]
     };
 
+    /**
+     * Initializes the dashboard view and event listeners
+     */
     function init() {
-        if(!activityForm) return; // Quick check if we are on dashboard
-        updateTypeDropdown(); // Initializes dropdown, simulator, and insights
+        if(!activityForm) return; 
+        updateTypeDropdown();
         updateDashboard();
 
         categorySelect.addEventListener('change', updateTypeDropdown);
@@ -81,9 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if(resetBtn) resetBtn.addEventListener('click', handleReset);
     }
 
+    /**
+     * Updates the specific action dropdown based on selected category
+     */
     function updateTypeDropdown() {
         const cat = categorySelect.value;
-        typeSelect.innerHTML = '';
+        
+        // Securely clear and populate dropdown
+        while(typeSelect.firstChild) typeSelect.removeChild(typeSelect.firstChild);
         
         typeOptions[cat].forEach(opt => {
             const option = document.createElement('option');
@@ -103,30 +112,43 @@ document.addEventListener('DOMContentLoaded', () => {
             valInput.placeholder = cat === 'transport' ? 'Distance in km' : 'Energy in kWh';
         }
 
-        // Dynamically update the 2 sections below!
         updateSimulatorUI(cat);
         updateInsightsUI(cat);
     }
 
+    /**
+     * Rebuilds the What-If simulator UI dynamically and securely
+     * @param {string} category - The selected emission category
+     */
     function updateSimulatorUI(category) {
-        simContainer.innerHTML = '';
+        // Securely clear contents
+        while(simContainer.firstChild) simContainer.removeChild(simContainer.firstChild);
         simSavingsEl.textContent = "0.0";
+        
         simulatorOptions[category].forEach(opt => {
             const div = document.createElement('div');
             div.className = 'toggle-item';
-            div.setAttribute('data-savings', opt.savings);
+            div.setAttribute('data-savings', opt.savings.toString());
             div.setAttribute('tabindex', '0');
             div.setAttribute('role', 'button');
             div.setAttribute('aria-pressed', 'false');
-            div.innerHTML = `
-                <span style="font-weight: 600;">${opt.title}</span>
-                <span class="subtitle">-${opt.savings.toFixed(1)} kg</span>
-            `;
+            
+            // Secure DOM creation replacing innerHTML
+            const titleSpan = document.createElement('span');
+            titleSpan.style.fontWeight = "600";
+            titleSpan.textContent = opt.title;
+            
+            const savingsSpan = document.createElement('span');
+            savingsSpan.className = 'subtitle';
+            savingsSpan.textContent = `-${opt.savings.toFixed(1)} kg`;
+            
+            div.appendChild(titleSpan);
+            div.appendChild(savingsSpan);
             
             div.addEventListener('click', () => {
                 div.classList.toggle('active');
                 let isPressed = div.getAttribute('aria-pressed') === 'true';
-                div.setAttribute('aria-pressed', !isPressed);
+                div.setAttribute('aria-pressed', String(!isPressed));
                 calculateSimulatorSavings();
             });
             div.addEventListener('keydown', (e) => {
@@ -140,19 +162,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * Calculates the total savings selected in the simulator
+     */
     function calculateSimulatorSavings() {
         let savings = 0;
         const toggles = simContainer.querySelectorAll('.toggle-item');
         toggles.forEach(toggle => {
             if (toggle.classList.contains('active')) {
-                savings += parseFloat(toggle.dataset.savings);
+                savings += parseFloat(toggle.getAttribute('data-savings') || "0");
             }
         });
         simSavingsEl.textContent = savings.toFixed(1);
     }
 
+    /**
+     * Rebuilds the Smart Insights list dynamically and securely
+     * @param {string} category - The selected emission category
+     */
     function updateInsightsUI(category) {
-        insightList.innerHTML = '';
+        // Securely clear contents
+        while(insightList.firstChild) insightList.removeChild(insightList.firstChild);
         insightMessage.textContent = `Here are targeted actions to reduce your ${category.toUpperCase()} footprint:`;
         
         recommendations[category].forEach(rec => {
@@ -162,6 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * Handles the form submission to log an activity
+     * @param {Event} e - Form submit event
+     */
     function handleFormSubmit(e) {
         e.preventDefault();
         const activity = {
@@ -173,25 +207,30 @@ document.addEventListener('DOMContentLoaded', () => {
         addActivity(activity);
         
         const btn = e.target.querySelector('button');
-        const ogText = btn.textContent;
-        btn.textContent = "Logged!";
-        btn.style.backgroundColor = "var(--color-primary)";
-        btn.style.color = "var(--text-main)";
-        
-        setTimeout(() => {
-            btn.textContent = ogText;
-            btn.style.backgroundColor = "var(--text-main)";
-            btn.style.color = "white";
-            valInput.value = '';
-            updateDashboard();
-        }, 1000);
+        if (btn) {
+            const ogText = btn.textContent;
+            btn.textContent = "Logged!";
+            btn.style.backgroundColor = "var(--color-primary)";
+            btn.style.color = "var(--text-main)";
+            
+            setTimeout(() => {
+                btn.textContent = ogText;
+                btn.style.backgroundColor = "var(--text-main)";
+                btn.style.color = "white";
+                valInput.value = '';
+                updateDashboard();
+            }, 1000);
+        }
     }
 
+    /**
+     * Updates the main dashboard UI, charts, and totals
+     */
     function updateDashboard() {
         const data = loadData();
         const totals = aggregateEmissions(data.activities);
         
-        totalEmissionsEl.textContent = totals.total;
+        totalEmissionsEl.textContent = totals.total.toString();
 
         const maxBarValue = Math.max(totals.transport, totals.food, totals.energy, 10);
         
@@ -200,6 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
         barEnergy.style.height = `${(totals.energy / maxBarValue) * 100}%`;
     }
 
+    /**
+     * Resets the application data
+     */
     function handleReset() {
         if(confirm("Are you sure you want to clear all your tracked footprint data?")) {
             clearData();

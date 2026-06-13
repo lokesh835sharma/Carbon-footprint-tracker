@@ -1,3 +1,4 @@
+"use strict";
 /**
  * core.js
  * EcoTrack Core Logic - Data Store and Calculations
@@ -5,6 +6,21 @@
  */
 
 const STORAGE_KEY = 'ecotrack_data';
+
+/**
+ * @typedef {Object} Baseline
+ * @property {number} transport
+ * @property {number} energy
+ * @property {number} diet
+ */
+
+/**
+ * @typedef {Object} AppData
+ * @property {Array<Object>} activities
+ * @property {number} goal
+ * @property {boolean} baselineSet
+ * @property {Baseline} baseline
+ */
 
 const defaultData = {
     activities: [],
@@ -14,6 +30,11 @@ const defaultData = {
 };
 
 // Global Data Store Functions
+
+/**
+ * Loads application data from LocalStorage
+ * @returns {AppData} The stored data or default data if none exists
+ */
 function loadData() {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
@@ -24,6 +45,10 @@ function loadData() {
     return defaultData;
 }
 
+/**
+ * Saves application data to LocalStorage
+ * @param {AppData} data - The data object to save
+ */
 function saveData(data) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -32,6 +57,11 @@ function saveData(data) {
     }
 }
 
+/**
+ * Adds a new activity to the data store
+ * @param {Object} activity - The activity details (category, type, value)
+ * @returns {AppData} The updated data object
+ */
 function addActivity(activity) {
     const data = loadData();
     data.activities.push({
@@ -43,6 +73,10 @@ function addActivity(activity) {
     return data;
 }
 
+/**
+ * Clears all data from LocalStorage and returns to defaults
+ * @returns {AppData} The default data object
+ */
 function clearData() {
     localStorage.removeItem(STORAGE_KEY);
     return defaultData;
@@ -55,6 +89,11 @@ const EMISSION_FACTORS = {
     energy: { electricity: 0.4 }
 };
 
+/**
+ * Calculates the CO2 emission for a single activity
+ * @param {Object} activity - The activity object
+ * @returns {number} The calculated emission value
+ */
 function calculateActivityEmission(activity) {
     if (!activity || !activity.category) return 0;
     let emission = 0;
@@ -72,6 +111,11 @@ function calculateActivityEmission(activity) {
     return Number(emission.toFixed(2));
 }
 
+/**
+ * Aggregates emissions across all logged activities
+ * @param {Array<Object>} activities - List of activity objects
+ * @returns {Object} Total emissions mapped by category and the grand total
+ */
 function aggregateEmissions(activities) {
     const totals = { transport: 0, food: 0, energy: 0, total: 0 };
     activities.forEach(act => {
