@@ -76,7 +76,7 @@ function addActivity(activity) {
     const data = loadData();
     data.activities.push({
         ...activity,
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 5), // more unique ID
+        id: Date.now().toString() + Math.random().toString(36).substring(2, 7), // more unique ID
         timestamp: new Date().toISOString()
     });
     saveData(data);

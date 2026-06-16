@@ -4,53 +4,179 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoTrack - Community Leaderboard</title>
+    <title>EcoTrack - Your Eco Impact</title>
+    <meta name="description" content="See your personal carbon footprint impact, eco equivalents, and earned badges.">
     <link rel="stylesheet" href="style.css">
     <style>
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border: var(--border-thick);
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            background-color: white;
-        }
-        .leaderboard-item.highlight {
-            background-color: var(--color-primary);
-            box-shadow: 4px 4px 0px var(--border-color);
-            transform: scale(1.02);
-            font-weight: 700;
-        }
-        .rank { font-size: 1.5rem; font-weight: 700; width: 40px;}
-        .badge-grid {
+        /* Stat Cards Grid */
+        .stat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
             margin-top: 1rem;
+        }
+        .stat-card {
+            border: var(--border-thick);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            background-color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hard);
+        }
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0.3rem 0;
+        }
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.7;
+        }
+        .stat-card .stat-unit {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Eco Equivalents */
+        .equiv-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .equiv-item {
+            border: var(--border-thick);
+            border-radius: 8px;
+            padding: 1.2rem 0.8rem;
+            text-align: center;
+            background-color: white;
+            transition: transform 0.2s;
+        }
+        .equiv-item:hover {
+            transform: scale(1.03);
+        }
+        .equiv-icon {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+        }
+        .equiv-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .equiv-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-top: 0.2rem;
+        }
+
+        /* Weekly Breakdown */
+        .weekly-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 140px;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding-top: 0.5rem;
+            border-bottom: var(--border-thick);
+        }
+        .week-bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+        }
+        .week-bar {
+            width: 100%;
+            max-width: 40px;
+            background-color: var(--color-secondary);
+            border: 2px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease-out;
+            min-height: 4px;
+        }
+        .week-bar.today {
+            background-color: var(--color-primary);
+            box-shadow: 0 0 0 2px var(--color-primary);
+        }
+        .week-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 0.4rem;
+        }
+        .week-val {
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            min-height: 1em;
+        }
+
+        /* Badges */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .badge-wrapper {
+            text-align: center;
         }
         .badge {
             border: var(--border-thick);
             border-radius: 50%;
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            background-color: #ddd;
-            opacity: 0.5;
-            transition: all 0.3s;
+            background-color: #e5e5e5;
+            opacity: 0.4;
+            transition: all 0.3s ease;
             margin: 0 auto;
-            font-size: 0.8rem;
-            font-weight: 700;
+            font-size: 1.8rem;
         }
         .badge.earned {
             opacity: 1;
             background-color: var(--color-accent);
-            color: white;
             box-shadow: var(--shadow-hover);
+            animation: badgePop 0.4s ease;
+        }
+        @keyframes badgePop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .badge-name {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+        .badge-desc {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            margin-top: 0.1rem;
+        }
+
+        @media (max-width: 600px) {
+            .equiv-grid { grid-template-columns: 1fr; }
+            .stat-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -60,91 +186,121 @@
             <h1>EcoTrack</h1>
             <p class="subtitle">Understand. Track. Reduce.</p>
         </div>
-        <nav class="nav-bar">
+        <nav class="nav-bar" aria-label="Main Navigation">
             <a href="index.html" class="nav-link">Dashboard</a>
             <a href="history.html" class="nav-link">History</a>
-            <a href="community.html" class="nav-link active">Community</a>
+            <a href="community.html" class="nav-link active">My Impact</a>
             <a href="learn.html" class="nav-link">Learn</a>
         </nav>
         <div></div>
     </header>
 
     <main class="dashboard-grid">
-        <section class="card pink">
-            <h2>Global Leaderboard</h2>
-            <p>See how your emissions stack up against the global average and top savers this week.</p>
-            
-            <div style="margin-top: 1.5rem;" id="leaderboardContainer">
-                <div class="leaderboard-item">
-                    <span class="rank">#1</span>
-                    <span>EcoWarrior99</span>
-                    <span>45 kg CO2</span>
+
+        <!-- SECTION 1: Personal Stats -->
+        <section class="card green" aria-labelledby="statsHeading">
+            <h2 id="statsHeading">Your Impact at a Glance</h2>
+            <p>Your personal carbon footprint summary based on all logged activities.</p>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Emissions</div>
+                    <div class="stat-value" id="statTotalCO2">0</div>
+                    <div class="stat-unit">kg CO2</div>
                 </div>
-                <div class="leaderboard-item">
-                    <span class="rank">#2</span>
-                    <span>GreenPlanet</span>
-                    <span>60 kg CO2</span>
+                <div class="stat-card">
+                    <div class="stat-label">Activities Logged</div>
+                    <div class="stat-value" id="statTotalLogs">0</div>
+                    <div class="stat-unit">entries</div>
                 </div>
-                <!-- User's score inserted here -->
-                <div class="leaderboard-item highlight" id="userScoreItem">
-                    <span class="rank">#?</span>
-                    <span>You</span>
-                    <span id="userScore">0 kg CO2</span>
+                <div class="stat-card">
+                    <div class="stat-label">Avg per Activity</div>
+                    <div class="stat-value" id="statAvgPerLog">—</div>
+                    <div class="stat-unit">kg CO2</div>
                 </div>
-                
-                <div class="leaderboard-item" style="background-color: #eee; margin-top: 2rem;">
-                    <span class="rank">-</span>
-                    <span>Global Average</span>
-                    <span>150 kg CO2</span>
+                <div class="stat-card">
+                    <div class="stat-label">Cleanest Category</div>
+                    <div class="stat-value" id="statBestCategory">—</div>
+                    <div class="stat-unit">&nbsp;</div>
                 </div>
             </div>
         </section>
 
-        <section class="card">
-            <h2>Your Badges</h2>
-            <p>Complete actions to unlock sustainable achievements.</p>
-            
-            <div class="badge-grid">
-                <div>
-                    <div class="badge" id="badgeStarted">First Log</div>
+        <!-- SECTION 2: Eco Equivalents -->
+        <section class="card pink" aria-labelledby="equivHeading">
+            <h2 id="equivHeading">What Your Footprint Equals</h2>
+            <p>Put your emissions in perspective with real-world equivalents.</p>
+
+            <div class="equiv-grid">
+                <div class="equiv-item">
+                    <div class="equiv-icon">🌳</div>
+                    <div class="equiv-value" id="eqTrees">0</div>
+                    <div class="equiv-label">Trees needed to offset (per year)</div>
                 </div>
-                <div>
-                    <div class="badge" id="badgeTransit">Public Transit Hero</div>
+                <div class="equiv-item">
+                    <div class="equiv-icon">🚗</div>
+                    <div class="equiv-value" id="eqDriving">0</div>
+                    <div class="equiv-label">Km of driving equivalent</div>
                 </div>
-                <div>
-                    <div class="badge" id="badgeVegan">Plant Based</div>
+                <div class="equiv-item">
+                    <div class="equiv-icon">📱</div>
+                    <div class="equiv-value" id="eqPhones">0</div>
+                    <div class="equiv-label">Phone charges equivalent</div>
                 </div>
             </div>
         </section>
+
+        <!-- SECTION 3: Weekly Breakdown -->
+        <section class="card" aria-labelledby="weeklyHeading">
+            <h2 id="weeklyHeading">This Week</h2>
+            <p>Your emission breakdown for the current week. Today is highlighted.</p>
+            <div class="weekly-chart" id="weeklyBreakdown">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: Badges & Achievements -->
+        <section class="card orange" aria-labelledby="badgesHeading">
+            <h2 id="badgesHeading">Badges & Achievements</h2>
+            <p>Complete actions to unlock sustainable milestones.</p>
+
+            <div class="badge-grid">
+                <div class="badge-wrapper">
+                    <div class="badge" id="badgeStarted">🌱</div>
+                    <div class="badge-name">First Log</div>
+                    <div class="badge-desc">Log 1 activity</div>
+                </div>
+                <div class="badge-wrapper">
+                    <div class="badge" id="badgeTransit">🚌</div>
+                    <div class="badge-name">Transit Hero</div>
+                    <div class="badge-desc">Use bus or train</div>
+                </div>
+                <div class="badge-wrapper">
+                    <div class="badge" id="badgeVegan">🥦</div>
+                    <div class="badge-name">Plant Based</div>
+                    <div class="badge-desc">Log a vegan meal</div>
+                </div>
+                <div class="badge-wrapper">
+                    <div class="badge" id="badgeCyclist">🚲</div>
+                    <div class="badge-name">Cyclist</div>
+                    <div class="badge-desc">Ride a bike</div>
+                </div>
+                <div class="badge-wrapper">
+                    <div class="badge" id="badgeDedicated">⭐</div>
+                    <div class="badge-name">Dedicated</div>
+                    <div class="badge-desc">Log 10 activities</div>
+                </div>
+                <div class="badge-wrapper">
+                    <div class="badge" id="badgeStreak">🔥</div>
+                    <div class="badge-name">On Fire</div>
+                    <div class="badge-desc">7-day streak</div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script src="core.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const { loadData, aggregateEmissions } = window.EcoCore;
-            const data = loadData();
-            const totals = aggregateEmissions(data.activities);
-            
-            // Update Leaderboard
-            document.getElementById('userScore').textContent = `${totals.total} kg CO2`;
-            
-            // Logic for Badges
-            if (data.activities.length > 0) {
-                document.getElementById('badgeStarted').classList.add('earned');
-                document.getElementById('badgeStarted').style.backgroundColor = 'var(--color-primary)';
-            }
-            
-            const hasTransit = data.activities.some(a => a.type === 'bus' || a.type === 'train');
-            if (hasTransit) {
-                document.getElementById('badgeTransit').classList.add('earned');
-                document.getElementById('badgeTransit').style.backgroundColor = 'var(--color-secondary)';
-            }
-
-            const hasVegan = data.activities.some(a => a.type === 'vegan');
-            if (hasVegan) {
-                document.getElementById('badgeVegan').classList.add('earned');
-            }
-        });
-    </script>
+    <script src="community.js"></script>
 </body>
 </html>

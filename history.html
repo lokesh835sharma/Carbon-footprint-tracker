@@ -28,7 +28,7 @@
         <nav class="nav-bar">
             <a href="index.html" class="nav-link">Dashboard</a>
             <a href="history.html" class="nav-link active">History</a>
-            <a href="community.html" class="nav-link">Community</a>
+            <a href="community.html" class="nav-link">My Impact</a>
             <a href="learn.html" class="nav-link">Learn</a>
         </nav>
         <div></div>
@@ -63,36 +63,6 @@
     </main>
 
     <script src="core.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const { loadData, calculateActivityEmission } = window.EcoCore;
-            const data = loadData();
-            const tbody = document.getElementById('historyTableBody');
-            const emptyMessage = document.getElementById('emptyMessage');
-
-            if (data.activities.length === 0) {
-                emptyMessage.style.display = 'block';
-                return;
-            }
-
-            // Sort by newest first
-            const sortedActivities = data.activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            sortedActivities.forEach(act => {
-                const date = new Date(act.timestamp).toLocaleDateString();
-                const emission = calculateActivityEmission(act);
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${date}</td>
-                    <td><span class="tag ${act.category}">${act.category.toUpperCase()}</span></td>
-                    <td style="text-transform: capitalize;">${act.type}</td>
-                    <td>${act.category === 'food' ? act.value + ' Meal' : act.value}</td>
-                    <td style="font-weight: 700;">+${emission} kg</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        });
-    </script>
+    <script src="history.js"></script>
 </body>
 </html>
